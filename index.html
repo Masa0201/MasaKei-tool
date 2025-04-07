@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>改行コード可視化ツール</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #333;
+      margin-top: 0;
+      font-size: 24px;
+    }
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: bold;
+    }
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 14px;
+      resize: vertical;
+    }
+    .controls {
+      margin: 15px 0;
+      display: flex;
+      align-items: center;
+    }
+    input[type="number"] {
+      width: 80px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .output-container {
+      margin-top: 20px;
+    }
+    .output {
+      background-color: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      white-space: pre-wrap;
+      font-family: monospace;
+      min-height: 100px;
+    }
+    .stats {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #666;
+    }
+    .highlight {
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>改行コード可視化ツール</h1>
+    <p>テキスト内の"\n"を実際の改行に変換して表示します。</p>
+    
+    <label for="input-text">テキストを入力してください：</label>
+    <textarea id="input-text" placeholder="ここにテキストを入力してください。例：ピオが鉱山にいた頃のナカマ。\nなぜか魂だけ残っている。\n\nスキル：ウサギが全て半透明化\n攻撃力と防御力が上昇\n敵の監視や特殊攻撃も\n回避できるようになる！">ピオが鉱山にいた頃のナカマ。\nなぜか魂だけ残っている。\n\nスキル：ウサギが全て半透明化\n攻撃力と防御力が上昇\n敵の監視や特殊攻撃も\n回避できるようになる！</textarea>
+    
+    <div class="controls">
+      <label for="max-chars">1行の最大文字数：</label>
+      <input type="number" id="max-chars" value="20" min="1">
+      <button id="process">変換</button>
+      <button id="copy-output" style="margin-left: 10px; background-color: #2196F3;">結果をコピー</button>
+    </div>
+    
+    <div class="output-container">
+      <label for="output">変換結果：</label>
+      <div id="output" class="output"></div>
+      <div id="stats" class="stats"></div>
+    </div>
+    
+    <div class="highlight">
+      <label>
+        <input type="checkbox" id="show-newlines"> 改行を可視化
+      </label>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const inputText = document.getElementById('input-text');
+      const maxChars = document.getElementById('max-chars');
+      const processBtn = document.getElementById('process');
+      const copyBtn = document.getElementById('copy-output');
+      const output = document.getElementById('output');
+      const stats = document.getElementById('stats');
+      const showNewlines = document.getElementById('show-newlines');
+      
+      // 初期処理を実行
+      processText();
+      
+      // 処理ボタンをクリックしたとき
+      processBtn.addEventListener('click', processText);
+      
+      // 改行可視化チェックボックスの変更時
+      showNewlines.addEventListener('change', processText);
+      
+      // コピーボタンをクリックしたとき
+      copyBtn.addEventListener('click', () => {
+        const textToCopy = output.textContent;
+        navigator.clipboard.writeText(textToCopy)
+          .then(() => {
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'コピーしました!';
+            copyBtn.style.backgroundColor = '#4CAF50';
+            setTimeout(() => {
+              copyBtn.textContent = originalText;
+              copyBtn.style.backgroundColor = '#2196F3';
+            }, 1500);
+          })
+          .catch(err => {
+            console.error('テキストのコピーに失敗しました:', err);
+            copyBtn.textContent = 'コピー失敗';
+            setTimeout(() => {
+              copyBtn.textContent = '結果をコピー';
+            }, 1500);
+          });
+      });
+      
+      // テキスト処理関数
+      function processText() {
+        const text = inputText.value;
+        const maxCharsVal = parseInt(maxChars.value, 10) || 20;
+        const showNewlinesChecked = showNewlines.checked;
+        
+        // 改行コードを実際の改行に変換
+        let processedText = text.replace(/\\n/g, '\n');
+        
+        // 最大文字数で折り返す処理
+        if (maxCharsVal > 0) {
+          const lines = processedText.split('\n');
+          processedText = '';
+          
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            if (line.length <= maxCharsVal) {
+              processedText += line + '\n';
+            } else {
+              let currentLine = '';
+              for (let j = 0; j < line.length; j++) {
+                currentLine += line[j];
+                if (currentLine.length === maxCharsVal) {
+                  processedText += currentLine + '\n';
+                  currentLine = '';
+                }
+              }
+              if (currentLine.length > 0) {
+                processedText += currentLine + '\n';
+              }
+            }
+          }
+        }
+        
+        // 出力
+        if (showNewlinesChecked) {
+          // 改行を可視化（↵で表示）
+          output.textContent = '';
+          const lines = processedText.split('\n');
+          for (let i = 0; i < lines.length; i++) {
+            const lineSpan = document.createElement('span');
+            lineSpan.textContent = lines[i];
+            output.appendChild(lineSpan);
+            
+            if (i < lines.length - 1) {
+              const newlineSymbol = document.createElement('span');
+              newlineSymbol.textContent = '↵';
+              newlineSymbol.style.color = '#ff6b6b';
+              newlineSymbol.style.fontWeight = 'bold';
+              output.appendChild(newlineSymbol);
+              output.appendChild(document.createElement('br'));
+            }
+          }
+        } else {
+          output.textContent = processedText;
+        }
+        
+        // 統計情報を表示
+        const originalLines = text.split(/\\n/).length;
+        const processedLines = processedText.split('\n').length;
+        const originalChars = text.length;
+        const processedChars = processedText.length;
+        
+        stats.textContent = `元のテキスト: ${originalChars}文字, \\n記号: ${originalLines - 1}個 ⟶ 変換後: ${processedLines}行`;
+      }
+    });
+  </script>
+</body>
+</html>
