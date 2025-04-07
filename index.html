@@ -199,6 +199,11 @@
     <h1>改行コード可視化ツール</h1>
     <p>テキスト内の改行コードを実際の改行に変換して表示します。タグの除外や行頭禁則文字の確認もできます。</p>
     
+    <div class="controls" style="display: flex; gap: 10px; margin-bottom: 15px;">
+      <button id="process" class="orange-button" style="flex: 1;">変換</button>
+      <button id="switch-to-output" class="blue-button" style="flex: 1;">結果を表示</button>
+    </div>
+    
     <div class="tab-container">
       <div class="tab-buttons">
         <button class="tab-button active" onclick="openTab(event, 'tab-input')">入力と設定</button>
@@ -245,10 +250,7 @@
         <label for="prohibited-chars">行頭禁則文字：</label>
         <textarea id="prohibited-chars" class="line-start-chars">』」）〕］｝〉》】｠〙〗»〟'")]}｣。．、，､｡,.‐〜゠–！？‼⁇⁈⁉!?・：；･:;ヽヾゝゞ々〻ーｰぁぃぅぇぉァィゥェォっゃゅょゎゕゖッャュョヮヵヶㇰㇱㇲㇳㇴㇵㇶㇷㇸㇹㇺㇻㇼㇽㇾㇿｧｨｩｪｫｬｭｮｯ</textarea>
         
-        <div class="setting-row" style="margin-top: 20px;">
-          <button id="process" class="orange-button">変換</button>
-          <button id="switch-to-output" class="blue-button" style="margin-left: 10px;">結果を表示</button>
-        </div>
+        <!-- ボタンは上部に移動したため削除 -->
       </div>
       
       <div id="tab-output" class="tab-content">
