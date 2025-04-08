@@ -1,613 +1,622 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>改行コード可視化ツール</title>
-  <style>
-    body {
-      font-family: 'Helvetica Neue', Arial, sans-serif;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #f5f5f5;
-    }
-    .container {
-      background-color: white;
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-    h1 {
-      color: #333;
-      margin-top: 0;
-      font-size: 24px;
-    }
-    h2 {
-      font-size: 18px;
-      margin-top: 25px;
-      padding-bottom: 5px;
-      border-bottom: 1px solid #eee;
-    }
-    label {
-      display: block;
-      margin: 15px 0 5px;
-      font-weight: bold;
-    }
-    textarea {
-      width: 100%;
-      min-height: 120px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 14px;
-      resize: vertical;
-    }
-    .controls {
-      margin: 15px 0;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
-    }
-    .setting-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-bottom: 10px;
-      gap: 10px;
-    }
-    input[type="text"], input[type="number"] {
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-    input[type="number"] {
-      width: 80px;
-    }
-    input[type="text"] {
-      width: 150px;
-    }
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background-color 0.2s;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    .blue-button {
-      background-color: #2196F3;
-    }
-    .blue-button:hover {
-      background-color: #0b7dda;
-    }
-    .orange-button {
-      background-color: #ff9800;
-    }
-    .orange-button:hover {
-      background-color: #e68a00;
-    }
-    .output-container {
-      margin-top: 20px;
-    }
-    .output {
-      background-color: #f8f8f8;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      padding: 15px;
-      white-space: pre-wrap;
-      font-family: monospace;
-      min-height: 100px;
-      line-height: 1.5;
-    }
-    .stats {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #666;
-    }
-    .tag-list {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-    }
-    .tag {
-      background-color: #e0e0e0;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-    }
-    .tag button {
-      background: none;
-      border: none;
-      color: #f44336;
-      cursor: pointer;
-      font-size: 14px;
-      padding: 0 0 0 5px;
-      margin: 0;
-    }
-    .highlight {
-      margin-top: 15px;
-    }
-    .line-start-chars {
-      width: 100%;
-    }
-    .prohibited-char {
-      color: #f44336;
-      font-weight: bold;
-    }
-    .warning-box {
-      background-color: #fff3cd;
-      border: 1px solid #ffeeba;
-      color: #856404;
-      padding: 10px;
-      border-radius: 4px;
-      margin-top: 10px;
-      display: none;
-    }
-    .tab-container {
-      margin-top: 20px;
-    }
-    .tab-buttons {
-      display: flex;
-      border-bottom: 1px solid #ddd;
-    }
-    .tab-button {
-      padding: 10px 15px;
-      background-color: #f1f1f1;
-      border: none;
-      cursor: pointer;
-      transition: 0.3s;
-      font-size: 14px;
-      border-radius: 4px 4px 0 0;
-      margin-right: 2px;
-    }
-    .tab-button:hover {
-      background-color: #ddd;
-    }
-    .tab-button.active {
-      background-color: #4CAF50;
-      color: white;
-    }
-    .tab-content {
-      display: none;
-      padding: 15px;
-      border: 1px solid #ddd;
-      border-top: none;
-      animation: fadeEffect 1s;
-    }
-    @keyframes fadeEffect {
-      from {opacity: 0;}
-      to {opacity: 1;}
-    }
-    .tab-content.active {
-      display: block;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ゲームテキスト改行表示確認ツール</title>
+    <style>
+        body {
+            font-family: 'Meiryo', 'Hiragino Sans', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .panel {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: monospace;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .result {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            min-height: 100px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            border-radius: 4px;
+        }
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .tag {
+            background-color: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .tag-close {
+            margin-left: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .warning {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .info {
+            margin-top: 10px;
+            color: #666;
+        }
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        .tab {
+            padding: 10px 15px;
+            background-color: #ddd;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+        }
+        .tab.active {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-bottom: none;
+        }
+        .character-counter {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .character-warning {
+            color: red;
+        }
+        .prohibited-character {
+            color: red;
+            font-weight: bold;
+        }
+        #downloadBtn {
+            background-color: #2196F3;
+        }
+        #downloadBtn:hover {
+            background-color: #0b7dda;
+        }
+        .flex-container {
+            display: flex;
+            gap: 20px;
+        }
+        .flex-column {
+            flex: 1;
+        }
+        .content {
+            display: none;
+        }
+        .content.active {
+            display: block;
+        }
+        #helpBtn {
+            background-color: #ff9800;
+        }
+        #helpBtn:hover {
+            background-color: #e68a00;
+        }
+        .prohibited-chars-display {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            max-height: 100px;
+            overflow-y: auto;
+            word-break: break-all;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>改行コード可視化ツール</h1>
-    <p>テキスト内の改行コードを実際の改行に変換して表示します。タグの除外や行頭禁則文字の確認もできます。</p>
+    <h1>ゲームテキスト改行表示確認ツール</h1>
     
-    <div class="controls" style="display: flex; gap: 10px; margin-bottom: 15px;">
-      <button id="process" class="orange-button" style="flex: 1;">変換</button>
-      <button id="switch-to-output" class="blue-button" style="flex: 1;">結果を表示</button>
+    <div class="button-container">
+        <button id="processBtn">テキスト処理実行</button>
+        <button id="downloadBtn">HTML形式でダウンロード</button>
+        <button id="helpBtn">ヘルプ表示</button>
     </div>
-    
-    <div class="tab-container">
-      <div class="tab-buttons">
-        <button class="tab-button active" onclick="openTab(event, 'tab-input')">入力と設定</button>
-        <button class="tab-button" onclick="openTab(event, 'tab-output')">変換結果</button>
-        <button class="tab-button" onclick="openTab(event, 'tab-help')">ヘルプ</button>
-      </div>
-      
-      <div id="tab-input" class="tab-content active">
-        <label for="input-text">テキストを入力してください：</label>
-        <textarea id="input-text" placeholder="ここにテキストを入力してください。例：ピオが鉱山にいた頃のナカマ。\nなぜか魂だけ残っている。\n\nスキル：ウサギが全て半透明化\n攻撃力と防御力が上昇\n敵の監視や特殊攻撃も\n回避できるようになる！">ピオが鉱山にいた頃のナカマ。\nなぜか魂だけ残っている。\n\nスキル：ウサギが全て半透明化\n攻撃力と防御力が上昇\n敵の監視や特殊攻撃も\n回避できるようになる！</textarea>
-        
-        <h2>基本設定</h2>
-        <div class="setting-row">
-          <label for="newline-code">改行コード：</label>
-          <input type="text" id="newline-code" value="\n" placeholder="\n, <br>など">
-          
-          <label for="max-chars" style="margin-left: 20px;">1行の最大文字数：</label>
-          <input type="number" id="max-chars" value="20" min="1">
+
+    <div class="tabs">
+        <div class="tab active" data-content="main">メイン</div>
+        <div class="tab" data-content="help">ヘルプ</div>
+    </div>
+
+    <div class="content active" id="main-content">
+        <div class="container">
+            <div class="panel">
+                <h2>テキスト入力</h2>
+                <div class="form-group">
+                    <textarea id="inputText" placeholder="ここにテキストを入力してください..."></textarea>
+                    <div class="character-counter">
+                        文字数: <span id="charCount">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>処理結果</h2>
+                <div id="result" class="result"></div>
+                <div id="warning" class="warning"></div>
+            </div>
+
+            <div class="panel">
+                <h2>設定</h2>
+                <div class="flex-container">
+                    <div class="flex-column">
+                        <div class="form-group">
+                            <label for="maxChars">1行の最大文字数:</label>
+                            <input type="number" id="maxChars" value="40" min="1">
+                            <div class="info">
+                                半角文字: <span id="halfWidthCount">40</span>文字 / 
+                                全角文字換算: <span id="fullWidthCount">20</span>文字
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="newLineCode">改行コード:</label>
+                            <div class="flex-container">
+                                <input type="text" id="newLineCode" placeholder="例: \n, <br>, {br}">
+                                <button id="addLineBreakBtn">追加</button>
+                            </div>
+                            <div class="tag-list" id="lineBreakList">
+                                <div class="tag">\n<span class="tag-close">×</span></div>
+                                <div class="tag">&lt;br&gt;<span class="tag-close">×</span></div>
+                                <div class="tag">{br}<span class="tag-close">×</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-column">
+                        <div class="form-group">
+                            <label for="removeTagWords">除去するタグ内の単語:</label>
+                            <div class="flex-container">
+                                <input type="text" id="removeTagWords" placeholder="例: font, color">
+                                <button id="addTagWordBtn">追加</button>
+                            </div>
+                            <div class="tag-list" id="tagWordList">
+                                <div class="tag">font<span class="tag-close">×</span></div>
+                                <div class="tag">color<span class="tag-close">×</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="prohibitedChar">行頭禁則文字追加:</label>
+                            <div class="flex-container">
+                                <input type="text" id="prohibitedChar" placeholder="追加する行頭禁則文字">
+                                <button id="addProhibitedCharBtn">追加</button>
+                            </div>
+                            <div class="info">現在の行頭禁則文字:</div>
+                            <div class="prohibited-chars-display" id="prohibitedCharsDisplay"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <h2>タグ除外設定</h2>
-        <p>タグ自体（&lt;タグ&gt;や&lt;/タグ&gt;）を変換結果から除外し、タグで囲まれた内容は残します。</p>
-        <div class="setting-row">
-          <input type="checkbox" id="ignore-tags" checked>
-          <label for="ignore-tags" style="display: inline;">タグを除外する（内容は保持）</label>
+    </div>
+
+    <div class="content" id="help-content">
+        <div class="panel">
+            <h2>ヘルプ</h2>
+            <div class="form-group">
+                <h3>ツールの使い方</h3>
+                <p>このツールは、ゲームテキストの改行を確認するためのものです。テキスト入力欄にゲームテキストを入力し、「テキスト処理実行」ボタンをクリックすると、設定に基づいて改行された結果が表示されます。</p>
+                
+                <h3>設定項目</h3>
+                <ul>
+                    <li><strong>1行の最大文字数</strong>: 1行に表示する最大文字数を設定します。半角文字を基準にカウントされます。</li>
+                    <li><strong>改行コード</strong>: テキスト内で改行として認識するコードを設定します。デフォルトでは「\n」「&lt;br&gt;」「{br}」が設定されています。</li>
+                    <li><strong>除去するタグ内の単語</strong>: タグ内（&lt;タグ&gt;や{タグ}など）に含まれる場合に、そのタグを丸ごと除去する単語を設定します。</li>
+                    <li><strong>行頭禁則文字追加</strong>: 行頭に来てはいけない文字を追加登録できます。</li>
+                </ul>
+                
+                <h3>行頭禁則文字について</h3>
+                <p>日本語の組版ルールでは、特定の文字が行頭に来ることを避けるべきとされています。このツールでは以下のような行頭禁則文字が設定されています。</p>
+                <ul>
+                    <li>終わり括弧類: 』」）〕］｝〉》】｠〙〗»〟'")]}｣</li>
+                    <li>句読点類: 。．、，､｡,.</li>
+                    <li>ハイフン類: ‐〜゠–</li>
+                    <li>区切り約物: ！？‼⁇⁈⁉!?</li>
+                    <li>中点類: ・：；･:;</li>
+                    <li>繰返し記号: ヽヾゝゞ々〻</li>
+                    <li>長音記号: ーｰ</li>
+                    <li>小書き仮名: ぁぃぅぇぉァィゥェォっゃゅょゎゕゖッャュョヮヵヶㇰㇱㇲㇳㇴㇵㇶㇷㇸㇹㇺㇻㇼㇽㇾㇿｧｨｩｪｫｬｭｮｯ</li>
+                </ul>
+                
+                <h3>出力について</h3>
+                <p>処理結果は画面上に表示されるほか、「HTML形式でダウンロード」ボタンをクリックすることで、HTML形式のファイルとして保存することができます。</p>
+            </div>
         </div>
-        <div class="setting-row">
-          <label for="custom-tag">タグを追加：</label>
-          <input type="text" id="custom-tag" placeholder="例: color">
-          <button id="add-tag" class="blue-button">追加</button>
-        </div>
-        <div class="tag-list" id="tag-list">
-          <div class="tag">color <button onclick="removeTag('color')">×</button></div>
-          <div class="tag">b <button onclick="removeTag('b')">×</button></div>
-          <div class="tag">i <button onclick="removeTag('i')">×</button></div>
-        </div>
-        
-        <h2>行頭禁則設定</h2>
-        <p>指定した文字が行頭に来た場合、警告を表示します。</p>
-        <div class="setting-row">
-          <input type="checkbox" id="check-prohibited" checked>
-          <label for="check-prohibited" style="display: inline;">行頭禁則をチェックする</label>
-        </div>
-        <label for="prohibited-chars">行頭禁則文字：</label>
-        <textarea id="prohibited-chars" class="line-start-chars">』」）〕］｝〉》】｠〙〗»〟'")]}｣。．、，､｡,.‐〜゠–！？‼⁇⁈⁉!?・：；･:;ヽヾゝゞ々〻ーｰぁぃぅぇぉァィゥェォっゃゅょゎゕゖッャュョヮヵヶㇰㇱㇲㇳㇴㇵㇶㇷㇸㇹㇺㇻㇼㇽㇾㇿｧｨｩｪｫｬｭｮｯ</textarea>
-        
-        <!-- ボタンは上部に移動したため削除 -->
-      </div>
-      
-      <div id="tab-output" class="tab-content">
-        <div class="output-container">
-          <div class="setting-row">
-            <input type="checkbox" id="show-newlines">
-            <label for="show-newlines" style="display: inline;">改行を可視化</label>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // デフォルトの行頭禁則文字
+            const defaultProhibitedChars = "』」）〕］｝〉》】｠〙〗»〟'\")]}｣。．、，､｡,.‐〜゠–！？‼⁇⁈⁉!?・：；･:;ヽヾゝゞ々〻ーｰぁぃぅぇぉァィゥェォっゃゅょゎゕゖッャュョヮヵヶㇰㇱㇲㇳㇴㇵㇶㇷㇸㇹㇺㇻㇼㇽㇾㇿｧｨｩｪｫｬｭｮｯ";
+            let prohibitedChars = defaultProhibitedChars;
             
-            <button id="copy-output" class="blue-button" style="margin-left: 20px;">結果をコピー</button>
-            <button id="download-html" class="orange-button" style="margin-left: 10px;">HTMLをダウンロード</button>
-          </div>
-          
-          <div id="warning-box" class="warning-box">
-            <strong>警告:</strong> <span id="warning-message"></span>
-          </div>
-          
-          <label for="output">変換結果：</label>
-          <div id="output" class="output"></div>
-          <div id="stats" class="stats"></div>
+            // 初期の改行コードとタグ単語リスト
+            const lineBreakCodes = ["\\n", "<br>", "{br}"];
+            const tagWords = ["font", "color"];
+            
+            // DOM要素
+            const maxCharsInput = document.getElementById('maxChars');
+            const halfWidthCountEl = document.getElementById('halfWidthCount');
+            const fullWidthCountEl = document.getElementById('fullWidthCount');
+            const newLineCodeInput = document.getElementById('newLineCode');
+            const addLineBreakBtn = document.getElementById('addLineBreakBtn');
+            const lineBreakListEl = document.getElementById('lineBreakList');
+            const removeTagWordsInput = document.getElementById('removeTagWords');
+            const addTagWordBtn = document.getElementById('addTagWordBtn');
+            const tagWordListEl = document.getElementById('tagWordList');
+            const prohibitedCharInput = document.getElementById('prohibitedChar');
+            const addProhibitedCharBtn = document.getElementById('addProhibitedCharBtn');
+            const prohibitedCharsDisplayEl = document.getElementById('prohibitedCharsDisplay');
+            const inputTextEl = document.getElementById('inputText');
+            const charCountEl = document.getElementById('charCount');
+            const resultEl = document.getElementById('result');
+            const warningEl = document.getElementById('warning');
+            const processBtn = document.getElementById('processBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const helpBtn = document.getElementById('helpBtn');
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.content');
+            
+            // 行頭禁則文字の表示
+            prohibitedCharsDisplayEl.textContent = prohibitedChars;
+            
+            // タブ切り替え
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const contentId = this.getAttribute('data-content');
+                    
+                    // タブの切り替え
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // コンテンツの切り替え
+                    contents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(contentId + '-content').classList.add('active');
+                });
+            });
+            
+            // ヘルプボタン
+            helpBtn.addEventListener('click', function() {
+                tabs.forEach(t => t.classList.remove('active'));
+                tabs[1].classList.add('active');
+                
+                contents.forEach(content => content.classList.remove('active'));
+                document.getElementById('help-content').classList.add('active');
+            });
+            
+            // 最大文字数の変更を監視
+            maxCharsInput.addEventListener('input', function() {
+                const value = parseInt(this.value) || 0;
+                halfWidthCountEl.textContent = value;
+                fullWidthCountEl.textContent = Math.floor(value / 2);
+            });
+            
+            // 文字数カウンターの更新
+            inputTextEl.addEventListener('input', function() {
+                charCountEl.textContent = this.value.length;
+            });
+            
+            // 改行コードの追加
+            addLineBreakBtn.addEventListener('click', function() {
+                const code = newLineCodeInput.value.trim();
+                if (code && !lineBreakCodes.includes(code)) {
+                    lineBreakCodes.push(code);
+                    updateLineBreakList();
+                    newLineCodeInput.value = '';
+                }
+            });
+            
+            // タグ単語の追加
+            addTagWordBtn.addEventListener('click', function() {
+                const word = removeTagWordsInput.value.trim();
+                if (word && !tagWords.includes(word)) {
+                    tagWords.push(word);
+                    updateTagWordList();
+                    removeTagWordsInput.value = '';
+                }
+            });
+            
+            // 行頭禁則文字の追加
+            addProhibitedCharBtn.addEventListener('click', function() {
+                const char = prohibitedCharInput.value.trim();
+                if (char && !prohibitedChars.includes(char)) {
+                    prohibitedChars += char;
+                    prohibitedCharInput.value = '';
+                    prohibitedCharsDisplayEl.textContent = prohibitedChars;
+                    alert(`"${char}" を行頭禁則文字に追加しました。`);
+                }
+            });
+            
+            // 改行コードリストの更新
+            function updateLineBreakList() {
+                lineBreakListEl.innerHTML = '';
+                lineBreakCodes.forEach(code => {
+                    const tagEl = document.createElement('div');
+                    tagEl.className = 'tag';
+                    tagEl.innerHTML = escapeHtml(code) + '<span class="tag-close">×</span>';
+                    tagEl.querySelector('.tag-close').addEventListener('click', function() {
+                        const index = lineBreakCodes.indexOf(code);
+                        if (index !== -1) {
+                            lineBreakCodes.splice(index, 1);
+                            updateLineBreakList();
+                        }
+                    });
+                    lineBreakListEl.appendChild(tagEl);
+                });
+            }
+            
+            // タグ単語リストの更新
+            function updateTagWordList() {
+                tagWordListEl.innerHTML = '';
+                tagWords.forEach(word => {
+                    const tagEl = document.createElement('div');
+                    tagEl.className = 'tag';
+                    tagEl.innerHTML = escapeHtml(word) + '<span class="tag-close">×</span>';
+                    tagEl.querySelector('.tag-close').addEventListener('click', function() {
+                        const index = tagWords.indexOf(word);
+                        if (index !== -1) {
+                            tagWords.splice(index, 1);
+                            updateTagWordList();
+                        }
+                    });
+                    tagWordListEl.appendChild(tagEl);
+                });
+            }
+            
+            // HTML特殊文字のエスケープ
+            function escapeHtml(str) {
+                return str
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+            
+            // 初期リストの表示
+            updateLineBreakList();
+            updateTagWordList();
+            
+            // テキスト処理の実行
+            processBtn.addEventListener('click', processText);
+            
+            // テキスト処理関数
+            function processText() {
+                let text = inputTextEl.value;
+                const maxChars = parseInt(maxCharsInput.value) || 40;
+                
+                // タグの削除
+                const tagRegex = /<[^>]*>/g;
+                const bracketRegex = /\{[^}]*\}/g;
+                
+                // タグ内に指定された単語があるかチェックして削除
+                text = text.replace(tagRegex, match => {
+                    let shouldRemove = false;
+                    tagWords.forEach(word => {
+                        if (match.includes(word)) {
+                            shouldRemove = true;
+                        }
+                    });
+                    return shouldRemove ? '' : match;
+                });
+                
+                // 括弧内に指定された単語があるかチェックして削除
+                text = text.replace(bracketRegex, match => {
+                    let shouldRemove = false;
+                    tagWords.forEach(word => {
+                        if (match.includes(word)) {
+                            shouldRemove = true;
+                        }
+                    });
+                    return shouldRemove ? '' : match;
+                });
+                
+                // 改行コードを実際の改行に変換
+                lineBreakCodes.forEach(code => {
+                    const escapedCode = code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(escapedCode, 'g');
+                    text = text.replace(regex, '\n');
+                });
+                
+                // 最大文字数による改行の適用
+                let lines = text.split('\n');
+                let formattedLines = [];
+                let warnings = [];
+                
+                lines.forEach((line, lineIndex) => {
+                    if (line.length === 0) {
+                        formattedLines.push('');
+                        return;
+                    }
+                    
+                    let currentLine = '';
+                    let currentCount = 0;
+                    let formattedLine = '';
+                    
+                    for (let i = 0; i < line.length; i++) {
+                        const char = line[i];
+                        const isFullWidth = /[^\x00-\xff]/.test(char);
+                        const charWidth = isFullWidth ? 2 : 1;
+                        
+                        if (currentCount + charWidth > maxChars) {
+                            formattedLines.push(formattedLine);
+                            
+                            // 行頭禁則チェック
+                            if (prohibitedChars.includes(char)) {
+                                // 警告メッセージを追加
+                                warnings.push(`行 ${formattedLines.length}に行頭禁則文字「${char}」があります。`);
+                                formattedLine = `<span class="prohibited-character">${char}</span>`;
+                            } else {
+                                formattedLine = char;
+                            }
+                            
+                            currentCount = charWidth;
+                        } else {
+                            formattedLine += char;
+                            currentCount += charWidth;
+                        }
+                    }
+                    
+                    if (formattedLine) {
+                        formattedLines.push(formattedLine);
+                    }
+                });
+                
+                // 結果の表示
+                resultEl.innerHTML = formattedLines.join('<br>');
+                
+                // 警告の表示
+                if (warnings.length > 0) {
+                    warningEl.innerHTML = warnings.join('<br>');
+                } else {
+                    warningEl.innerHTML = '';
+                }
+            }
+            
+            // HTMLファイルのダウンロード
+            downloadBtn.addEventListener('click', function() {
+                processText(); // 最新の処理を実行
+                
+                const htmlContent = `
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テキスト表示結果</title>
+    <style>
+        body {
+            font-family: 'Meiryo', 'Hiragino Sans', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .result {
+            white-space: pre-wrap;
+            font-family: monospace;
+            line-height: 1.5;
+        }
+        .warning {
+            color: red;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .prohibited-character {
+            color: red;
+            font-weight: bold;
+        }
+        .info {
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>テキスト表示結果</h1>
+    <div class="container">
+        <div class="result">${resultEl.innerHTML}</div>
+        <div class="warning">${warningEl.innerHTML}</div>
+        <div class="info">
+            <p>最大文字数: ${maxCharsInput.value}文字 (半角基準)</p>
+            <p>使用した改行コード: ${lineBreakCodes.join(', ')}</p>
+            <p>除去したタグ単語: ${tagWords.join(', ')}</p>
         </div>
-      </div>
-      
-      <div id="tab-help" class="tab-content">
-        <h2>使い方</h2>
-        <ol>
-          <li>「入力と設定」タブでテキストを入力します。</li>
-          <li>必要に応じて改行コードや最大文字数を設定します。</li>
-          <li>タグを除外したい場合は「タグを除外する」にチェックを入れ、必要なタグを追加します。</li>
-          <li>行頭禁則チェックを行いたい場合は「行頭禁則をチェックする」にチェックを入れます。</li>
-          <li>「変換」ボタンをクリックして処理を実行します。</li>
-          <li>「結果を表示」ボタンをクリックするか、「変換結果」タブをクリックして結果を確認します。</li>
-        </ol>
-        
-        <h2>機能説明</h2>
-        <ul>
-          <li><strong>改行コード設定</strong>: 任意の改行コードを指定できます（例: \n, &lt;br&gt;, //n など）</li>
-          <li><strong>タグ除外</strong>: &lt;タグ&gt;内容&lt;/タグ&gt; 形式のテキストから、タグ部分のみを除外し内容は保持します。</li>
-          <li><strong>行頭禁則チェック</strong>: 指定した文字が行頭に来た場合に警告します。</li>
-          <li><strong>改行可視化</strong>: 改行位置を「↵」記号で表示します。</li>
-          <li><strong>HTMLダウンロード</strong>: このツール自体をHTMLファイルとしてダウンロードできます。</li>
-        </ul>
-      </div>
     </div>
-  </div>
-
-  <script>
-    // タブ切り替え機能
-    function openTab(evt, tabName) {
-      var i, tabContent, tabButtons;
-      tabContent = document.getElementsByClassName("tab-content");
-      for (i = 0; i < tabContent.length; i++) {
-        tabContent[i].classList.remove("active");
-      }
-      tabButtons = document.getElementsByClassName("tab-button");
-      for (i = 0; i < tabButtons.length; i++) {
-        tabButtons[i].classList.remove("active");
-      }
-      document.getElementById(tabName).classList.add("active");
-      evt.currentTarget.classList.add("active");
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const inputText = document.getElementById('input-text');
-      const newlineCode = document.getElementById('newline-code');
-      const maxChars = document.getElementById('max-chars');
-      const ignoreTags = document.getElementById('ignore-tags');
-      const customTag = document.getElementById('custom-tag');
-      const addTagBtn = document.getElementById('add-tag');
-      const tagList = document.getElementById('tag-list');
-      const checkProhibited = document.getElementById('check-prohibited');
-      const prohibitedChars = document.getElementById('prohibited-chars');
-      const processBtn = document.getElementById('process');
-      const switchToOutputBtn = document.getElementById('switch-to-output');
-      const copyBtn = document.getElementById('copy-output');
-      const downloadBtn = document.getElementById('download-html');
-      const output = document.getElementById('output');
-      const stats = document.getElementById('stats');
-      const showNewlines = document.getElementById('show-newlines');
-      const warningBox = document.getElementById('warning-box');
-      const warningMessage = document.getElementById('warning-message');
-      
-      // 初期タグリスト
-      let tags = ['color', 'b', 'i'];
-      
-      // 初期処理を実行
-      processText();
-      
-      // 処理ボタンをクリックしたとき
-      processBtn.addEventListener('click', () => {
-        processText();
-      });
-      
-      // 結果表示ボタンをクリックしたとき
-      switchToOutputBtn.addEventListener('click', () => {
-        openTab({ currentTarget: document.querySelectorAll('.tab-button')[1] }, 'tab-output');
-      });
-      
-      // 改行可視化チェックボックスの変更時
-      showNewlines.addEventListener('change', () => {
-        updateOutput();
-      });
-      
-      // コピーボタンをクリックしたとき
-      copyBtn.addEventListener('click', () => {
-        copyToClipboard(output.textContent);
-      });
-      
-      // HTMLダウンロードボタンをクリックしたとき
-      downloadBtn.addEventListener('click', () => {
-        downloadHtml();
-      });
-      
-      // タグを追加ボタンをクリックしたとき
-      addTagBtn.addEventListener('click', () => {
-        addTag();
-      });
-      
-      // タグ入力欄でEnterキーを押したとき
-      customTag.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          addTag();
-        }
-      });
-      
-      // タグを追加する関数
-      function addTag() {
-        const tag = customTag.value.trim();
-        if (tag && !tags.includes(tag)) {
-          tags.push(tag);
-          updateTagList();
-          customTag.value = '';
-          processText();
-        }
-      }
-      
-      // タグを削除する関数（グローバルスコープに配置）
-      window.removeTag = function(tag) {
-        tags = tags.filter(t => t !== tag);
-        updateTagList();
-        processText();
-      };
-      
-      // タグリストを更新する関数
-      function updateTagList() {
-        tagList.innerHTML = '';
-        tags.forEach(tag => {
-          const tagElement = document.createElement('div');
-          tagElement.className = 'tag';
-          tagElement.innerHTML = `${tag} <button onclick="removeTag('${tag}')">×</button>`;
-          tagList.appendChild(tagElement);
+</body>
+</html>
+                `;
+                
+                const blob = new Blob([htmlContent], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'text-display-result.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
         });
-      }
-      
-      // HTMLをダウンロードする関数
-      function downloadHtml() {
-        const htmlContent = document.documentElement.outerHTML;
-        const blob = new Blob([htmlContent], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = '改行コード可視化ツール.html';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
-      
-      // クリップボードにコピーする関数
-      function copyToClipboard(text) {
-        navigator.clipboard.writeText(text)
-          .then(() => {
-            const originalText = copyBtn.textContent;
-            copyBtn.textContent = 'コピーしました!';
-            copyBtn.style.backgroundColor = '#4CAF50';
-            setTimeout(() => {
-              copyBtn.textContent = originalText;
-              copyBtn.style.backgroundColor = '#2196F3';
-            }, 1500);
-          })
-          .catch(err => {
-            console.error('テキストのコピーに失敗しました:', err);
-            copyBtn.textContent = 'コピー失敗';
-            setTimeout(() => {
-              copyBtn.textContent = '結果をコピー';
-            }, 1500);
-          });
-      }
-      
-      // テキスト処理の関数
-      function processText() {
-        const text = inputText.value;
-        const maxCharsVal = parseInt(maxChars.value, 10) || 20;
-        const newlineCodeVal = newlineCode.value || '\\n';
-        const ignoreTagsChecked = ignoreTags.checked;
-        const checkProhibitedChecked = checkProhibited.checked;
-        const prohibitedCharsVal = prohibitedChars.value;
-        
-        // 正規表現パターンを構築（エスケープが必要な特殊文字に対応）
-        let pattern;
-        // 特殊な正規表現文字をエスケープ
-        const escapeRegExp = (str) => {
-          return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        };
-        
-        // エスケープされた正規表現を作成
-        pattern = new RegExp(escapeRegExp(newlineCodeVal), 'g');
-        
-        // テキストを処理
-        let processedText = text;
-        
-        // 改行コードを実際の改行に変換
-        processedText = processedText.replace(pattern, '\n');
-        
-        // タグを処理（タグ除外がチェックされている場合）
-        if (ignoreTagsChecked && tags.length > 0) {
-          // タグとその中身を抽出して、中身だけを残す処理
-          const tagPattern = new RegExp(`<(${tags.join('|')}).*?>(.*?)</(${tags.join('|')})>`, 'gs');
-          processedText = processedText.replace(tagPattern, (match, tag1, content, tag2) => {
-            return content; // タグの中身だけを返す
-          });
-          
-          // 閉じタグのないシンプルなタグを処理
-          const simpleTagPattern = new RegExp(`<(?:${tags.join('|')}).*?>`, 'g');
-          processedText = processedText.replace(simpleTagPattern, '');
-        }
-        
-        // 最大文字数で折り返す処理
-        let wrappedText = '';
-        if (maxCharsVal > 0) {
-          const lines = processedText.split('\n');
-          
-          for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            if (line.length <= maxCharsVal) {
-              wrappedText += line + '\n';
-            } else {
-              let currentPos = 0;
-              while (currentPos < line.length) {
-                wrappedText += line.substr(currentPos, maxCharsVal) + '\n';
-                currentPos += maxCharsVal;
-              }
-            }
-          }
-        } else {
-          wrappedText = processedText + '\n';
-        }
-        
-        // 処理結果を保存
-        window.processedResult = wrappedText;
-        
-        // 出力を更新
-        updateOutput();
-        
-        // 統計情報を表示
-        const originalChars = text.length;
-        const processedLines = wrappedText.split('\n').length - 1;
-        
-        // 改行コードの数をカウント
-        const newlineMatches = text.match(pattern);
-        const newlineCount = newlineMatches ? newlineMatches.length : 0;
-        
-        stats.textContent = `元のテキスト: ${originalChars}文字, ${newlineCodeVal}記号: ${newlineCount}個 ⟶ 変換後: ${processedLines}行`;
-      }
-      
-      // 出力を更新する関数
-      function updateOutput() {
-        const wrappedText = window.processedResult;
-        const showNewlinesChecked = showNewlines.checked;
-        const checkProhibitedChecked = checkProhibited.checked;
-        const prohibitedCharsVal = prohibitedChars.value;
-        
-        // 警告メッセージをリセット
-        warningBox.style.display = 'none';
-        warningMessage.textContent = '';
-        
-        // 出力
-        if (showNewlinesChecked) {
-          // 改行を可視化（↵で表示）
-          output.textContent = '';
-          const lines = wrappedText.split('\n');
-          
-          for (let i = 0; i < lines.length - 1; i++) {
-            const lineSpan = document.createElement('span');
-            
-            // 行頭禁則チェック
-            if (checkProhibitedChecked && lines[i].length > 0) {
-              const firstChar = lines[i].charAt(0);
-              if (prohibitedCharsVal.includes(firstChar)) {
-                const prohibitedSpan = document.createElement('span');
-                prohibitedSpan.className = 'prohibited-char';
-                prohibitedSpan.textContent = firstChar;
-                
-                lineSpan.appendChild(prohibitedSpan);
-                lineSpan.appendChild(document.createTextNode(lines[i].substring(1)));
-                
-                // 警告メッセージを表示
-                warningBox.style.display = 'block';
-                if (warningMessage.textContent) {
-                  warningMessage.textContent += '、';
-                }
-                warningMessage.textContent += `行頭に禁則文字「${firstChar}」があります`;
-              } else {
-                lineSpan.textContent = lines[i];
-              }
-            } else {
-              lineSpan.textContent = lines[i];
-            }
-            
-            output.appendChild(lineSpan);
-            
-            const newlineSymbol = document.createElement('span');
-            newlineSymbol.textContent = '↵';
-            newlineSymbol.style.color = '#ff6b6b';
-            newlineSymbol.style.fontWeight = 'bold';
-            output.appendChild(newlineSymbol);
-            output.appendChild(document.createElement('br'));
-          }
-        } else {
-          // 通常表示
-          output.innerHTML = '';
-          const lines = wrappedText.split('\n');
-          
-          for (let i = 0; i < lines.length - 1; i++) {
-            const lineDiv = document.createElement('div');
-            
-            // 行頭禁則チェック
-            if (checkProhibitedChecked && lines[i].length > 0) {
-              const firstChar = lines[i].charAt(0);
-              if (prohibitedCharsVal.includes(firstChar)) {
-                const prohibitedSpan = document.createElement('span');
-                prohibitedSpan.className = 'prohibited-char';
-                prohibitedSpan.textContent = firstChar;
-                
-                lineDiv.appendChild(prohibitedSpan);
-                lineDiv.appendChild(document.createTextNode(lines[i].substring(1)));
-                
-                // 警告メッセージを表示
-                warningBox.style.display = 'block';
-                if (warningMessage.textContent) {
-                  warningMessage.textContent += '、';
-                }
-                warningMessage.textContent += `行頭に禁則文字「${firstChar}」があります`;
-              } else {
-                lineDiv.textContent = lines[i];
-              }
-            } else {
-              lineDiv.textContent = lines[i];
-            }
-            
-            output.appendChild(lineDiv);
-          }
-        }
-      }
-      
-      // タグリストを初期化
-      updateTagList();
-    });
-  </script>
+    </script>
 </body>
 </html>
