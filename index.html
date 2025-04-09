@@ -78,6 +78,7 @@
             white-space: pre-wrap;
             font-family: monospace;
             border-radius: 4px;
+            font-size: 16px; /* デフォルトフォントサイズ */
         }
         .tag-list {
             display: flex;
@@ -134,10 +135,10 @@
             color: red;
             font-weight: bold;
         }
-        #downloadBtn {
+        #downloadToolBtn {
             background-color: #2196F3;
         }
-        #downloadBtn:hover {
+        #downloadToolBtn:hover {
             background-color: #0b7dda;
         }
         .flex-container {
@@ -169,6 +170,20 @@
             overflow-y: auto;
             word-break: break-all;
         }
+        .font-size-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .font-size-controls button {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        .font-size-display {
+            margin: 0 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -176,7 +191,7 @@
     
     <div class="button-container">
         <button id="processBtn">テキスト処理実行</button>
-        <button id="downloadBtn">HTML形式でダウンロード</button>
+        <button id="downloadToolBtn">ツールをHTMLでダウンロード</button>
         <button id="helpBtn">ヘルプ表示</button>
     </div>
 
@@ -199,6 +214,11 @@
 
             <div class="panel">
                 <h2>処理結果</h2>
+                <div class="font-size-controls">
+                    <button id="decreaseFontBtn">文字サイズ 小</button>
+                    <span class="font-size-display">サイズ: <span id="fontSizeDisplay">16</span>px</span>
+                    <button id="increaseFontBtn">文字サイズ 大</button>
+                </div>
                 <div id="result" class="result"></div>
                 <div id="warning" class="warning"></div>
             </div>
@@ -232,14 +252,14 @@
                     
                     <div class="flex-column">
                         <div class="form-group">
-                            <label for="removeTagWords">除去するタグ内の単語:</label>
+                            <label for="tagBracket">タグを判別する括弧:</label>
                             <div class="flex-container">
-                                <input type="text" id="removeTagWords" placeholder="例: font, color">
-                                <button id="addTagWordBtn">追加</button>
+                                <input type="text" id="tagBracket" placeholder="例: <>, {}, []">
+                                <button id="addTagBracketBtn">追加</button>
                             </div>
-                            <div class="tag-list" id="tagWordList">
-                                <div class="tag">font<span class="tag-close">×</span></div>
-                                <div class="tag">color<span class="tag-close">×</span></div>
+                            <div class="tag-list" id="tagBracketList">
+                                <div class="tag">&lt;&gt;<span class="tag-close">×</span></div>
+                                <div class="tag">{}<span class="tag-close">×</span></div>
                             </div>
                         </div>
                         
@@ -269,9 +289,12 @@
                 <ul>
                     <li><strong>1行の最大文字数</strong>: 1行に表示する最大文字数を設定します。半角文字を基準にカウントされます。</li>
                     <li><strong>改行コード</strong>: テキスト内で改行として認識するコードを設定します。デフォルトでは「\n」「&lt;br&gt;」「{br}」が設定されています。</li>
-                    <li><strong>除去するタグ内の単語</strong>: タグ内（&lt;タグ&gt;や{タグ}など）に含まれる場合に、そのタグを丸ごと除去する単語を設定します。</li>
+                    <li><strong>タグを判別する括弧</strong>: テキスト内でタグとして認識する括弧のペアを設定します。設定された括弧で囲まれた内容はタグとして処理され、除去されます。</li>
                     <li><strong>行頭禁則文字追加</strong>: 行頭に来てはいけない文字を追加登録できます。</li>
                 </ul>
+                
+                <h3>フォントサイズの調整</h3>
+                <p>処理結果のフォントサイズは「文字サイズ 小」「文字サイズ 大」ボタンで調整できます。</p>
                 
                 <h3>行頭禁則文字について</h3>
                 <p>日本語の組版ルールでは、特定の文字が行頭に来ることを避けるべきとされています。このツールでは以下のような行頭禁則文字が設定されています。</p>
@@ -287,7 +310,7 @@
                 </ul>
                 
                 <h3>出力について</h3>
-                <p>処理結果は画面上に表示されるほか、「HTML形式でダウンロード」ボタンをクリックすることで、HTML形式のファイルとして保存することができます。</p>
+                <p>処理結果は画面上に表示されます。また、「ツールをHTMLでダウンロード」ボタンをクリックすることで、ツール自体をHTML形式のファイルとして保存できます。</p>
             </div>
         </div>
     </div>
@@ -298,9 +321,9 @@
             const defaultProhibitedChars = "』」）〕］｝〉》】｠〙〗»〟'\")]}｣。．、，､｡,.‐〜゠–！？‼⁇⁈⁉!?・：；･:;ヽヾゝゞ々〻ーｰぁぃぅぇぉァィゥェォっゃゅょゎゕゖッャュョヮヵヶㇰㇱㇲㇳㇴㇵㇶㇷㇸㇹㇺㇻㇼㇽㇾㇿｧｨｩｪｫｬｭｮｯ";
             let prohibitedChars = defaultProhibitedChars;
             
-            // 初期の改行コードとタグ単語リスト
+            // 初期の改行コードとタグ括弧リスト
             const lineBreakCodes = ["\\n", "<br>", "{br}"];
-            const tagWords = ["font", "color"];
+            const tagBrackets = ["<>", "{}"];
             
             // DOM要素
             const maxCharsInput = document.getElementById('maxChars');
@@ -309,9 +332,9 @@
             const newLineCodeInput = document.getElementById('newLineCode');
             const addLineBreakBtn = document.getElementById('addLineBreakBtn');
             const lineBreakListEl = document.getElementById('lineBreakList');
-            const removeTagWordsInput = document.getElementById('removeTagWords');
-            const addTagWordBtn = document.getElementById('addTagWordBtn');
-            const tagWordListEl = document.getElementById('tagWordList');
+            const tagBracketInput = document.getElementById('tagBracket');
+            const addTagBracketBtn = document.getElementById('addTagBracketBtn');
+            const tagBracketListEl = document.getElementById('tagBracketList');
             const prohibitedCharInput = document.getElementById('prohibitedChar');
             const addProhibitedCharBtn = document.getElementById('addProhibitedCharBtn');
             const prohibitedCharsDisplayEl = document.getElementById('prohibitedCharsDisplay');
@@ -320,13 +343,39 @@
             const resultEl = document.getElementById('result');
             const warningEl = document.getElementById('warning');
             const processBtn = document.getElementById('processBtn');
-            const downloadBtn = document.getElementById('downloadBtn');
+            const downloadToolBtn = document.getElementById('downloadToolBtn');
             const helpBtn = document.getElementById('helpBtn');
             const tabs = document.querySelectorAll('.tab');
             const contents = document.querySelectorAll('.content');
+            const increaseFontBtn = document.getElementById('increaseFontBtn');
+            const decreaseFontBtn = document.getElementById('decreaseFontBtn');
+            const fontSizeDisplayEl = document.getElementById('fontSizeDisplay');
             
             // 行頭禁則文字の表示
             prohibitedCharsDisplayEl.textContent = prohibitedChars;
+            
+            // フォントサイズ設定
+            let currentFontSize = 16;
+            
+            // フォントサイズの増減
+            increaseFontBtn.addEventListener('click', function() {
+                if (currentFontSize < 32) {
+                    currentFontSize += 2;
+                    updateFontSize();
+                }
+            });
+            
+            decreaseFontBtn.addEventListener('click', function() {
+                if (currentFontSize > 8) {
+                    currentFontSize -= 2;
+                    updateFontSize();
+                }
+            });
+            
+            function updateFontSize() {
+                resultEl.style.fontSize = currentFontSize + 'px';
+                fontSizeDisplayEl.textContent = currentFontSize;
+            }
             
             // タブ切り替え
             tabs.forEach(tab => {
@@ -374,13 +423,15 @@
                 }
             });
             
-            // タグ単語の追加
-            addTagWordBtn.addEventListener('click', function() {
-                const word = removeTagWordsInput.value.trim();
-                if (word && !tagWords.includes(word)) {
-                    tagWords.push(word);
-                    updateTagWordList();
-                    removeTagWordsInput.value = '';
+            // タグ括弧の追加
+            addTagBracketBtn.addEventListener('click', function() {
+                const bracket = tagBracketInput.value.trim();
+                if (bracket && !tagBrackets.includes(bracket) && bracket.length === 2) {
+                    tagBrackets.push(bracket);
+                    updateTagBracketList();
+                    tagBracketInput.value = '';
+                } else {
+                    alert('括弧は開始文字と終了文字の2文字で入力してください。例: {}, <>');
                 }
             });
             
@@ -413,21 +464,21 @@
                 });
             }
             
-            // タグ単語リストの更新
-            function updateTagWordList() {
-                tagWordListEl.innerHTML = '';
-                tagWords.forEach(word => {
+            // タグ括弧リストの更新
+            function updateTagBracketList() {
+                tagBracketListEl.innerHTML = '';
+                tagBrackets.forEach(bracket => {
                     const tagEl = document.createElement('div');
                     tagEl.className = 'tag';
-                    tagEl.innerHTML = escapeHtml(word) + '<span class="tag-close">×</span>';
+                    tagEl.innerHTML = escapeHtml(bracket) + '<span class="tag-close">×</span>';
                     tagEl.querySelector('.tag-close').addEventListener('click', function() {
-                        const index = tagWords.indexOf(word);
+                        const index = tagBrackets.indexOf(bracket);
                         if (index !== -1) {
-                            tagWords.splice(index, 1);
-                            updateTagWordList();
+                            tagBrackets.splice(index, 1);
+                            updateTagBracketList();
                         }
                     });
-                    tagWordListEl.appendChild(tagEl);
+                    tagBracketListEl.appendChild(tagEl);
                 });
             }
             
@@ -443,7 +494,7 @@
             
             // 初期リストの表示
             updateLineBreakList();
-            updateTagWordList();
+            updateTagBracketList();
             
             // テキスト処理の実行
             processBtn.addEventListener('click', processText);
@@ -454,29 +505,17 @@
                 const maxChars = parseInt(maxCharsInput.value) || 40;
                 
                 // タグの削除
-                const tagRegex = /<[^>]*>/g;
-                const bracketRegex = /\{[^}]*\}/g;
-                
-                // タグ内に指定された単語があるかチェックして削除
-                text = text.replace(tagRegex, match => {
-                    let shouldRemove = false;
-                    tagWords.forEach(word => {
-                        if (match.includes(word)) {
-                            shouldRemove = true;
-                        }
-                    });
-                    return shouldRemove ? '' : match;
-                });
-                
-                // 括弧内に指定された単語があるかチェックして削除
-                text = text.replace(bracketRegex, match => {
-                    let shouldRemove = false;
-                    tagWords.forEach(word => {
-                        if (match.includes(word)) {
-                            shouldRemove = true;
-                        }
-                    });
-                    return shouldRemove ? '' : match;
+                tagBrackets.forEach(bracketPair => {
+                    const startChar = bracketPair.charAt(0);
+                    const endChar = bracketPair.charAt(1);
+                    
+                    // 特殊文字のエスケープ
+                    const escapedStartChar = startChar.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const escapedEndChar = endChar.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    
+                    // タグを削除する正規表現
+                    const regex = new RegExp(escapedStartChar + '[^' + escapedEndChar + ']*' + escapedEndChar, 'g');
+                    text = text.replace(regex, '');
                 });
                 
                 // 改行コードを実際の改行に変換
@@ -541,76 +580,19 @@
                 }
             }
             
-            // HTMLファイルのダウンロード
-            downloadBtn.addEventListener('click', function() {
-                processText(); // 最新の処理を実行
-                
-                const htmlContent = `
-<!DOCTYPE html>
+            // ツール自体をHTMLファイルとしてダウンロード
+            downloadToolBtn.addEventListener('click', function() {
+                // 現在のHTMLドキュメント全体を取得
+                const htmlContent = `<!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>テキスト表示結果</title>
-    <style>
-        body {
-            font-family: 'Meiryo', 'Hiragino Sans', sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .container {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .result {
-            white-space: pre-wrap;
-            font-family: monospace;
-            line-height: 1.5;
-        }
-        .warning {
-            color: red;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-        .prohibited-character {
-            color: red;
-            font-weight: bold;
-        }
-        .info {
-            margin-top: 20px;
-            color: #666;
-            font-size: 14px;
-        }
-    </style>
-</head>
-<body>
-    <h1>テキスト表示結果</h1>
-    <div class="container">
-        <div class="result">${resultEl.innerHTML}</div>
-        <div class="warning">${warningEl.innerHTML}</div>
-        <div class="info">
-            <p>最大文字数: ${maxCharsInput.value}文字 (半角基準)</p>
-            <p>使用した改行コード: ${lineBreakCodes.join(', ')}</p>
-            <p>除去したタグ単語: ${tagWords.join(', ')}</p>
-        </div>
-    </div>
-</body>
-</html>
-                `;
+` + document.documentElement.innerHTML + `
+</html>`;
                 
                 const blob = new Blob([htmlContent], { type: 'text/html' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'text-display-result.html';
+                a.download = 'game-text-line-break-tool.html';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
